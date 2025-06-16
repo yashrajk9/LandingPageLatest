@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafetyObserve - Enterprise Safety Intelligence Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066ff;
+            --primary-dark: #0052cc;
+            --secondary: #ff6b35;
+            --accent: #00d4aa;
+            --warning: #ffab00;
+            --danger: #ff5630;
+            --success: #36b37e;
+            --dark: #091e42;
+            --dark-light: #172b4d;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-800);
+            background: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--dark);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo-icon::before {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: var(--white);
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+        }
+
+        .nav-cta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .nav-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .nav-toggle span {
+            width: 24px;
+            height: 2px;
+            background: var(--gray-600);
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .nav-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .nav-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-ghost:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 1px 3px rgba(0, 102, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--white) 50%, var(--gray-50) 100%);
+            overflow: hidden;
+            padding-top: 70px;
+        }
+
+        .hero-bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e2e8f0' fill-opacity='0.3'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.6;
+            z-index: 1;
+        }
+
+        .hero-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .hero-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 5vw, 4.5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-500);
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            max-width: 500px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .stat {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard-mockup {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .traffic-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray-300);
+        }
+
+        .traffic-light.red { background: var(--danger); }
+        .traffic-light.yellow { background: var(--warning); }
+        .traffic-light.green { background: var(--success); }
+
+        .mockup-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .metric-card.warning::before { background: var(--warning); }
+        .metric-card.success::before { background: var(--success); }
+        .metric-card.danger::before { background: var(--danger); }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .chart-area {
+            height: 120px;
+            background: linear-gradient(180deg, var(--gray-50) 0%, var(--white) 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background: linear-gradient(135deg, rgba(0, 102, 255, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+            clip-path: polygon(0 100%, 15% 85%, 30% 70%, 45% 80%, 60% 60%, 75% 40%, 90% 30%, 100% 20%, 100% 100%);
+        }
+
+        /* Trust Section */
+        .trust-section {
+            padding: 4rem 0;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .trust-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            text-align: center;
+        }
+
+        .trust-title {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .trust-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .trust-logo {
+            height: 40px;
+            width: 120px;
+            background: var(--gray-200);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 6rem 0;
+            background: var(--gray-50);
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 3.5rem);
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-500);
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card.coming-soon {
+            position: relative;
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger);
+            color: var(--white);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .coming-soon-badge::before {
+            content: '*';
+            font-weight: 700;
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--white);
+        }
+
+        .feature-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--gray-500);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .feature-benefits {
+            list-style: none;
+        }
+
+        .feature-benefit {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--gray-600);
+        }
+
+        .benefit-check {
+            width: 16px;
+            height: 16px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .benefit-check::before {
+            content: '✓';
+            color: var(--white);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 0;
+            background: var(--dark);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--dark) 50%, var(--primary-dark) 100%);
+            opacity: 0.1;
+        }
+
+        .cta-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 3.5rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-subtitle {
+            font-size: 1.125rem;
+            color: var(--gray-300);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-white {
+            background: var(--white);
+            color: var(--dark);
+        }
+
+        .btn-white:hover {
+            background: var(--gray-100);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--white);
+        }
+
+        .cta-guarantee {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--gray-900);
+            color: var(--gray-400);
+            padding: 3rem 0 1rem;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            color: var(--white);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info {
+            margin-bottom: 1rem;
+        }
+
+        .contact-info strong {
+            color: var(--white);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--gray-800);
+            border-radius: 8px;
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--gray-800);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-copyright {
+            font-size: 0.875rem;
+        }
+
+        .powered-by {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-400);
+            font-size: 0.875rem;
+        }
+
+        .powered-by a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .powered-by a:hover {
+            color: var(--white);
+        }
+
+        .de-logo {
+            width: 24px;
+            height: 24px;
+            background: var(--white);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.75rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .nav-menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                background: var(--white);
+                flex-direction: column;
+                padding: 2rem 1rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                transform: translateY(-100%);
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+
+            .nav-menu.active {
+                transform: translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .nav-toggle {
+                display: flex;
+            }
+
+            .nav-cta {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+                text-align: center;
+            }
+
+            .hero-stats {
+                justify-content: center;
+                gap: 1rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-large {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .trust-logos {
+                gap: 1.5rem;
+            }
+
+            .trust-logo {
+                width: 100px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0 1rem;
+            }
+
+            .nav-logo {
+                font-size: 1.25rem;
+            }
+
+            .hero {
+                padding-top: 70px;
+            }
+
+            .hero-container {
+                padding: 1rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .mockup-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .metric-card {
+                padding: 1rem 0.75rem;
+            }
+
+            .metric-value {
+                font-size: 1.25rem;
+            }
+
+            .metric-label {
+                font-size: 0.65rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .cta-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .footer-main {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.75rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .cta-title {
+                font-size: 1.5rem;
+            }
+
+            .mockup-content {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-mockup {
+                padding: 1rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .social-links {
+                justify-content: center;
+            }
+        }
+
+        /* Scroll animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <div class="logo-icon"></div>
+                SafetyObserve
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link">Platform</a></li>
+                <li><a href="#" class="nav-link">Solutions</a></li>
+                <li><a href="#" class="nav-link">Resources</a></li>
+                <li><a href="#" class="nav-link">Pricing</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="#" class="btn btn-ghost">Sign In</a>
+                <a href="#" class="btn btn-primary">Request Demo</a>
+            </div>
+            <div class="nav-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg-pattern"></div>
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <div class="badge-dot"></div>
+                    AI-Powered Safety Intelligence
+                </div>
+                <h1 class="hero-title">Transform Workplace Safety with Intelligent Observation Management</h1>
+                <p class="hero-subtitle">Leverage advanced analytics, real-time monitoring, and predictive insights to create safer work environments and prevent incidents before they occur.</p>
+                <div class="hero-actions">
+                    <a href="#" class="btn btn-primary btn-large">Start Free Trial</a>
+                    <a href="#" class="btn btn-secondary btn-large">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        Watch Demo
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">99.7%</div>
+                        <div class="stat-label">Incident Prevention</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Observations Tracked</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">85%</div>
+                        <div class="stat-label">Risk Reduction</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="dashboard-mockup">
+                    <div class="mockup-header">
+                        <div class="traffic-light red"></div>
+                        <div class="traffic-light yellow"></div>
+                        <div class="traffic-light green"></div>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="metric-card">
+                            <div class="metric-value">11</div>
+                            <div class="metric-label">Total Observations</div>
+                        </div>
+                        <div class="metric-card warning">
+                            <div class="metric-value">10</div>
+                            <div class="metric-label">Pending</div>
+                        </div>
+                        <div class="metric-card success">
+                            <div class="metric-value">1</div>
+                            <div class="metric-label">Resolved</div>
+                        </div>
+                        <div class="metric-card danger">
+                            <div class="metric-value">3</div>
+                            <div class="metric-label">High Risk</div>
+                        </div>
+                    </div>
+                    <div class="chart-area">
+                        <div class="chart-line"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Section -->
+    <section class="trust-section">
+        <div class="trust-container">
+            <div class="trust-title">Trusted by Industry Leaders</div>
+            <div class="trust-logos">
+                <div class="trust-logo">Manufacturing Co</div>
+                <div class="trust-logo">Energy Corp</div>
+                <div class="trust-logo">Construction Ltd</div>
+                <div class="trust-logo">Healthcare Systems</div>
+                <div class="trust-logo">Logistics Group</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-container">
+            <div class="section-header reveal">
+                <h2 class="section-title">Comprehensive Safety Intelligence Platform</h2>
+                <p class="section-subtitle">Every component engineered to deliver actionable insights that prevent workplace incidents and ensure regulatory compliance.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">AI-Enhanced Risk Assessment</h3>
+                    <p class="feature-description">Machine learning algorithms automatically categorize observations, assess risk levels, and predict potential incidents with 94% accuracy.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Automated risk classification
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Predictive incident modeling
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Continuous learning algorithms
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Real-Time Analytics Dashboard</h3>
+                    <p class="feature-description">Comprehensive visualization of safety metrics with live data updates, trend analysis, and executive-level reporting capabilities.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Live data visualization
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Executive reporting suite
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Custom KPI tracking
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal coming-soon">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Location Intelligence Mapping</h3>
+                    <p class="feature-description">Geographic risk analysis with heat mapping, zone-based alerts, and multi-location safety performance tracking across your entire organization.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Geographic risk heat maps
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Zone-based alerting system
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Multi-site performance tracking
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9h-2V9h2v2zm0-4h-2V5h2v2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Advanced Reporting Engine</h3>
+                    <p class="feature-description">Generate comprehensive safety reports with automated scheduling, compliance templates, and regulatory documentation for audit readiness.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Automated report generation
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Compliance-ready templates
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Audit trail documentation
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal coming-soon">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Workflow Automation</h3>
+                    <p class="feature-description">Streamlined incident response with automated notifications, task assignments, and escalation protocols to ensure rapid resolution.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Intelligent task routing
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Automated escalation rules
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Real-time notifications
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="feature-card reveal coming-soon">
+                    <div class="coming-soon-badge">Coming Soon</div>
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Enterprise Integration</h3>
+                    <p class="feature-description">Seamless connectivity with existing ERP, HRIS, and safety management systems through robust APIs and pre-built connectors.</p>
+                    <ul class="feature-benefits">
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            RESTful API architecture
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Pre-built system connectors
+                        </li>
+                        <li class="feature-benefit">
+                            <div class="benefit-check"></div>
+                            Single sign-on support
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2 class="cta-title">Ready to Transform Your Safety Program?</h2>
+            <p class="cta-subtitle">Join industry leaders who trust SafetyObserve to protect their workforce and maintain regulatory compliance with intelligent safety management.</p>
+            <div class="cta-actions">
+                <a href="#" class="btn btn-white btn-large">Start Free 30-Day Trial</a>
+                <a href="#" class="btn btn-outline btn-large">Schedule Enterprise Demo</a>
+            </div>
+            <p class="cta-guarantee">No credit card required • Enterprise-grade security • 24/7 support</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-section">
+                    <h3>SafetyObserve</h3>
+                    <p>Transform workplace safety with intelligent observation management and AI-powered risk assessment.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link" aria-label="LinkedIn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="Twitter">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="social-link" aria-label="YouTube">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Information</h3>
+                    <div class="contact-info">
+                        <strong>Address:</strong>
+                        123 Safety Boulevard<br>
+                        Enterprise District<br>
+                        New York, NY 10001
+                    </div>
+                    <div class="contact-info">
+                        <strong>Phone:</strong>
+                        +1 (555) 123-4567
+                    </div>
+                    <div class="contact-info">
+                        <strong>Email:</strong>
+                        info@safetyobserve.com
+                    </div>
+                    <div class="contact-info">
+                        <strong>Support:</strong>
+                        support@safetyobserve.com
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Platform Overview</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Solutions</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Pricing</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Documentation</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">API Reference</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Support Center</a></p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">About Us</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Careers</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">News & Press</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Privacy Policy</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Terms of Service</a></p>
+                    <p><a href="#" style="color: var(--gray-400); text-decoration: none;">Security</a></p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p>&copy; 2025 SafetyObserve. Enterprise safety intelligence platform. All rights reserved.</p>
+                </div>
+                <div class="powered-by">
+                    Powered by 
+                    <a href="https://www.digitalenergy.ai/home" target="_blank" rel="noopener noreferrer">
+                        <div class="de-logo">DE</div>
+                        Digital Energy
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // GSAP ScrollTrigger setup
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Mobile navigation toggle
+        const navToggle = document.querySelector('.nav-toggle');
+        const navMenu = document.querySelector('.nav-menu');
+
+        navToggle.addEventListener('click', () => {
+            navToggle.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navToggle.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Navigation scroll effect
+        let lastScrollTop = 0;
+        const nav = document.querySelector('.nav');
+
+        window.addEventListener('scroll', () => {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                nav.style.transform = 'translateY(-100%)';
+            } else {
+                nav.style.transform = 'translateY(0)';
+            }
+            
+            if (scrollTop > 50) {
+                nav.style.background = 'rgba(255, 255, 255, 0.98)';
+                nav.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+            } else {
+                nav.style.background = 'rgba(255, 255, 255, 0.95)';
+                nav.style.boxShadow = 'none';
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Scroll reveal animations
+        function initScrollAnimations() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            reveals.forEach((reveal, index) => {
+                gsap.fromTo(reveal, 
+                    { 
+                        opacity: 0, 
+                        y: 50,
+                        scale: 0.95
+                    },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.8,
+                        delay: index * 0.1,
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: reveal,
+                            start: "top 85%",
+                            end: "bottom 15%",
+                            toggleActions: "play none none reverse"
+                        }
+                    }
+                );
+            });
+        }
+
+        // Counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            
+            counters.forEach(counter => {
+                const text = counter.textContent;
+                const isPercentage = text.includes('%');
+                const hasK = text.includes('K');
+                const hasPlus = text.includes('+');
+                
+                let targetValue = parseFloat(text.replace(/[^\d.]/g, ''));
+                
+                if (hasK) targetValue *= 1000;
+                
+                const duration = 2000;
+                const startTime = performance.now();
+                
+                function updateCounter(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    const currentValue = targetValue * easeOut;
+                    
+                    let displayValue;
+                    if (hasK) {
+                        displayValue = Math.floor(currentValue / 1000) + 'K';
+                    } else if (isPercentage) {
+                        displayValue = currentValue.toFixed(1) + '%';
+                    } else {
+                        displayValue = Math.floor(currentValue).toString();
+                    }
+                    
+                    if (hasPlus && progress === 1) {
+                        displayValue += '+';
+                    }
+                    
+                    counter.textContent = displayValue;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(updateCounter);
+                    }
+                }
+                
+                requestAnimationFrame(updateCounter);
+            });
+        }
+
+        // Trigger counter animation when stats section is visible
+        ScrollTrigger.create({
+            trigger: '.hero-stats',
+            start: 'top 80%',
+            onEnter: animateCounters
+        });
+
+        // Dashboard mockup animation
+        function animateDashboard() {
+            const metrics = document.querySelectorAll('.metric-card');
+            
+            metrics.forEach((metric, index) => {
+                gsap.fromTo(metric,
+                    {
+                        y: 20,
+                        opacity: 0,
+                        scale: 0.9
+                    },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.6,
+                        delay: index * 0.1,
+                        ease: "back.out(1.7)"
+                    }
+                );
+            });
+
+            // Animate chart line
+            gsap.fromTo('.chart-line',
+                {
+                    clipPath: 'polygon(0 100%, 0 100%, 0 100%, 0 100%, 0 100%, 0 100%, 0 100%, 0 100%, 0 100%)'
+                },
+                {
+                    clipPath: 'polygon(0 100%, 15% 85%, 30% 70%, 45% 80%, 60% 60%, 75% 40%, 90% 30%, 100% 20%, 100% 100%)',
+                    duration: 1.5,
+                    delay: 0.5,
+                    ease: "power2.out"
+                }
+            );
+        }
+
+        // Button hover effects
+        function initButtonEffects() {
+            const buttons = document.querySelectorAll('.btn');
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    gsap.to(btn, {
+                        scale: 1.02,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, {
+                        scale: 1,
+                        duration: 0.3,
+                        ease: "power2.out"
+                    });
+                });
+                
+                btn.addEventListener('mousedown', () => {
+                    gsap.to(btn, {
+                        scale: 0.98,
+                        duration: 0.1
+                    });
+                });
+                
+                btn.addEventListener('mouseup', () => {
+                    gsap.to(btn, {
+                        scale: 1.02,
+                        duration: 0.1
+                    });
+                });
+            });
+        }
+
+        // Feature card hover effects
+        function initFeatureEffects() {
+            const featureCards = document.querySelectorAll('.feature-card');
+            
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, {
+                        y: -8,
+                        boxShadow: '0 25px 50px rgba(0, 0, 0, 0.15)',
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        y: 0,
+                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                });
+            });
+        }
+
+        // Parallax effect for hero section
+        function initParallaxEffect() {
+            gsap.to('.hero-bg-pattern', {
+                yPercent: -50,
+                ease: "none",
+                scrollTrigger: {
+                    trigger: '.hero',
+                    start: "top bottom",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+        }
+
+        // Initialize all animations and effects
+        document.addEventListener('DOMContentLoaded', () => {
+            initScrollAnimations();
+            initButtonEffects();
+            initFeatureEffects();
+            initParallaxEffect();
+            
+            // Animate dashboard on load
+            setTimeout(animateDashboard, 500);
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
